@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ผู้ดูแลระบบ - ChemLab Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --lab-navy:#0B2E33;
+            --lab-navy-deep:#081F23;
+            --lab-teal:#16C79A;
+            --lab-amber:#FFB238;
+            --lab-coral:#E4573D;
+            --lab-paper:#F7F5F0;
+            --lab-ink:#1B262C;
+            --lab-line:#E4E0D6;
+        }
+
+        *{ font-family:'Sarabun', sans-serif; }
+        .mono{ font-family:'Space Mono', monospace; }
+
+        body{ background:var(--lab-paper); color:var(--lab-ink); }
+
+        /* ---------- Navbar ---------- */
+        .lab-navbar{
+            background:linear-gradient(180deg, var(--lab-navy) 0%, var(--lab-navy-deep) 100%) !important;
+        }
+        .lab-brand{ display:flex; align-items:center; gap:.6rem; color:var(--lab-paper) !important; text-decoration:none; }
+        .lab-brand:hover{ color:var(--lab-teal) !important; }
+        .brand-tile{
+            width:34px; height:34px;
+            border:1.5px solid rgba(255,178,56,.55);
+            border-radius:7px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            color:var(--lab-amber); background:rgba(255,178,56,.1); line-height:1;
+        }
+        .brand-tile .num{ font-size:.4rem; align-self:flex-start; margin-left:4px; opacity:.7; }
+        .brand-tile .sym{ font-size:.8rem; font-weight:700; }
+        .brand-name{ font-weight:700; font-size:1.05rem; }
+
+        .btn-back{
+            background:transparent; border:1.5px solid rgba(247,245,240,.4);
+            color:var(--lab-paper); font-weight:600; border-radius:7px;
+        }
+        .btn-back:hover{ background:rgba(247,245,240,.1); color:var(--lab-teal); border-color:var(--lab-teal); }
+
+        /* ---------- Stat cards ---------- */
+        .stat-card{
+            border-radius:14px;
+            color:#fff;
+            position:relative;
+            overflow:hidden;
+        }
+        .stat-card .stat-icon{
+            position:absolute; right:.9rem; top:.7rem;
+            font-size:1.8rem; opacity:.35;
+        }
+        .stat-card h6{ opacity:.75; font-size:.8rem; letter-spacing:.03em; }
+        .stat-card h2{ font-family:'Space Mono', monospace; }
+
+        .stat-navy{ background:linear-gradient(135deg, var(--lab-navy), var(--lab-navy-deep)); }
+        .stat-teal{ background:linear-gradient(135deg, var(--lab-teal), #0C9A78); }
+        .stat-coral{ background:linear-gradient(135deg, var(--lab-coral), #C24428); }
+        .stat-amber{ background:linear-gradient(135deg, var(--lab-amber), #D98F1B); color:var(--lab-navy-deep) !important; }
+        .stat-amber h6{ opacity:.65; color:var(--lab-navy-deep); }
+
+        /* ---------- Report table ---------- */
+        .report-card{ border-radius:16px; overflow:hidden; }
+        .report-card .card-header{
+            background:#fff !important;
+            border-bottom:1px solid var(--lab-line);
+        }
+        .report-eyebrow{ font-size:.72rem; letter-spacing:.14em; font-weight:700; color:#0C9A78; }
+
+        table thead.table-light th{
+            background:var(--lab-paper) !important;
+            color:#6B6656; font-size:.78rem; letter-spacing:.04em;
+            text-transform:uppercase; font-weight:700;
+            border-bottom:1.5px solid var(--lab-line);
+        }
+        table tbody tr:hover{ background:rgba(22,199,154,.05); }
+        table td{ border-color:var(--lab-line); }
+
+        .badge-pass{ background:var(--lab-teal) !important; color:var(--lab-navy-deep) !important; }
+        .badge-fail{ background:var(--lab-coral) !important; }
+
+        .score-cell{ font-family:'Space Mono', monospace; font-weight:700; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark lab-navbar mb-4 shadow-sm">
+        <div class="container py-2">
+            <a class="lab-brand" href="{% url 'home' %}">
+                <div class="brand-tile mono">
+                    <span class="num">78</span>
+                    <span class="sym">Pt</span>
+                </div>
+                <span class="brand-name">ChemLab Admin Dashboard</span>
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-back btn-sm">กลับหน้าหลัก</a>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+
+        <!-- บัตรสรุปสถิติภาพรวม -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card stat-navy border-0 shadow-sm p-3 text-center">
+                    <span class="stat-icon">📋</span>
+                    <h6 class="mono mb-1">ผู้ทำแบบทดสอบทั้งหมด</h6>
+                    <h2 class="fw-bold my-1">{{ total_attempts }} <span class="fs-6">ครั้ง</span></h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card stat-teal border-0 shadow-sm p-3 text-center">
+                    <span class="stat-icon">✅</span>
+                    <h6 class="mono mb-1">สอบผ่าน (≥ 80%)</h6>
+                    <h2 class="fw-bold my-1">{{ passed_count }} <span class="fs-6">คน</span></h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card stat-coral border-0 shadow-sm p-3 text-center">
+                    <span class="stat-icon">❌</span>
+                    <h6 class="mono mb-1">สอบไม่ผ่าน</h6>
+                    <h2 class="fw-bold my-1">{{ failed_count }} <span class="fs-6">คน</span></h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card stat-amber border-0 shadow-sm p-3 text-center">
+                    <span class="stat-icon">📈</span>
+                    <h6 class="mono mb-1">อัตราการสอบผ่าน</h6>
+                    <h2 class="fw-bold my-1">{{ pass_rate }}%</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- ตารางแสดงรายชื่อและคะแนน -->
+        <div class="card report-card border-0 shadow-sm">
+            <div class="card-header py-3">
+                <div class="report-eyebrow mono mb-1">EXAM REPORT</div>
+                <h5 class="fw-bold text-dark mb-0">📊 รายงานผลสอบแบบทดสอบ 40 ข้อ</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">#</th>
+                                <th>ชื่อผู้ใช้งาน (Username)</th>
+                                <th>ชื่อ-นามสกุล / อีเมล</th>
+                                <th class="text-center">คะแนนที่ได้</th>
+                                <th class="text-center">คิดเป็นร้อยละ</th>
+                                <th class="text-center">สถานะ</th>
+                                <th>วันที่-เวลา</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in results_40 %}
+                                <tr>
+                                    <td class="ps-4">{{ forloop.counter }}</td>
+                                    <td><strong>{{ row.user.username }}</strong></td>
+                                    <td>
+                                        {% if row.user.first_name %}
+                                            {{ row.user.first_name }} {{ row.user.last_name }}
+                                        {% else %}
+                                            <span class="text-muted">{{ row.user.email|default:"-" }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center score-cell fs-5">{{ row.score }} / 40</td>
+                                    <td class="text-center score-cell">{{ row.percentage|floatformat:1 }}%</td>
+                                    <td class="text-center">
+                                        {% if row.passed %}
+                                            <span class="badge badge-pass px-3 py-2">ผ่าน</span>
+                                        {% else %}
+                                            <span class="badge badge-fail px-3 py-2">ไม่ผ่าน</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ row.date_taken|date:"d/m/Y H:i" }} น.</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        ยังไม่มีประวัติการทำแบบทดสอบในระบบ
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

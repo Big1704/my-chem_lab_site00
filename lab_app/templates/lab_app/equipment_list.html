@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - ChemLab Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --lab-navy:#0B2E33;
+            --lab-navy-deep:#081F23;
+            --lab-teal:#16C79A;
+            --lab-amber:#FFB238;
+            --lab-coral:#E4573D;
+            --lab-paper:#F7F5F0;
+            --lab-ink:#1B262C;
+            --lab-line:#E4E0D6;
+        }
+
+        *{ font-family:'Sarabun', sans-serif; }
+        .mono{ font-family:'Space Mono', monospace; }
+
+        body{ background:var(--lab-paper); color:var(--lab-ink); }
+
+        /* ---------- Remap Bootstrap contextual colors to the lab palette ----------
+           The template picks colors dynamically via {{ category_color }}
+           (primary / success / danger), so we retheme those exact classes
+           instead of renaming them, to keep the template logic untouched. */
+        .bg-primary{ background-color:var(--lab-teal) !important; }
+        .btn-primary{ background-color:var(--lab-teal) !important; border-color:var(--lab-teal) !important; color:var(--lab-navy-deep) !important; }
+        .btn-primary:hover{ background-color:#12b28a !important; border-color:#12b28a !important; }
+        .border-primary{ border-color:var(--lab-teal) !important; }
+
+        .bg-success{ background-color:var(--lab-amber) !important; color:var(--lab-navy-deep) !important; }
+        .btn-success{ background-color:var(--lab-amber) !important; border-color:var(--lab-amber) !important; color:var(--lab-navy-deep) !important; }
+        .btn-success:hover{ background-color:#ffc35c !important; border-color:#ffc35c !important; }
+        .border-success{ border-color:var(--lab-amber) !important; }
+
+        .bg-danger{ background-color:var(--lab-coral) !important; }
+        .btn-danger{ background-color:var(--lab-coral) !important; border-color:var(--lab-coral) !important; }
+        .btn-danger:hover{ background-color:#cf4630 !important; border-color:#cf4630 !important; }
+        .border-danger{ border-color:var(--lab-coral) !important; }
+
+        /* ---------- Navbar ---------- */
+        .lab-navbar{
+            background:linear-gradient(180deg, var(--lab-navy) 0%, var(--lab-navy-deep) 100%) !important;
+        }
+        .lab-brand{ display:flex; align-items:center; gap:.6rem; color:var(--lab-paper) !important; text-decoration:none; }
+        .lab-brand:hover{ color:var(--lab-teal) !important; }
+        .brand-tile{
+            width:34px; height:34px;
+            border:1.5px solid rgba(22,199,154,.55);
+            border-radius:7px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            color:var(--lab-teal); background:rgba(22,199,154,.08); line-height:1;
+        }
+        .brand-tile .num{ font-size:.4rem; align-self:flex-start; margin-left:4px; opacity:.7; }
+        .brand-tile .sym{ font-size:.8rem; font-weight:700; }
+        .brand-name{ font-weight:700; font-size:1.1rem; }
+
+        .btn-back{
+            background:transparent; border:1.5px solid rgba(247,245,240,.4);
+            color:var(--lab-paper); font-weight:600; border-radius:7px;
+        }
+        .btn-back:hover{ background:rgba(247,245,240,.1); color:var(--lab-teal); border-color:var(--lab-teal); }
+
+        /* ---------- Page header ---------- */
+        .page-eyebrow{ font-size:.72rem; letter-spacing:.14em; font-weight:700; color:#0C9A78; }
+        .page-title{ font-weight:700; color:var(--lab-ink); }
+        .count-badge{ font-weight:700; }
+
+        /* ---------- Item cards ---------- */
+        .item-card{
+            border-radius:14px;
+            overflow:hidden;
+            border-top:4px solid transparent;
+            transition:transform .2s ease, box-shadow .2s ease;
+        }
+        .item-card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 20px 36px -18px rgba(11,46,51,.3) !important;
+        }
+        .item-card .card-img-top{ background:#fff; }
+        .no-image-box{
+            height:220px;
+            background:
+                repeating-linear-gradient(45deg, rgba(11,46,51,.04) 0 10px, transparent 10px 20px),
+                var(--lab-paper);
+            color:#8A8578;
+            border-bottom:1px solid var(--lab-line);
+            font-size:.9rem;
+        }
+        .item-card .card-title{ color:var(--lab-ink); }
+
+        /* ---------- Empty state ---------- */
+        .empty-state{
+            background:#fff;
+            border:1.5px dashed var(--lab-line);
+            border-radius:14px;
+            color:#6B6656;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark lab-navbar mb-4 shadow-sm">
+        <div class="container py-2">
+            <a class="lab-brand" href="{% url 'home' %}">
+                <div class="brand-tile mono">
+                    <span class="num">6</span>
+                    <span class="sym">C</span>
+                </div>
+                <span class="brand-name">ChemLab Learning</span>
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-back btn-sm">← กลับหน้าหลัก</a>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <div class="page-eyebrow mono mb-1">CATEGORY</div>
+        <div class="d-flex align-items-center mb-4 flex-wrap gap-2">
+            <h2 class="page-title mb-0 me-3">{{ title }}</h2>
+            <span class="badge bg-{{ category_color }} count-badge rounded-pill fs-6">{{ items|length }} รายการ</span>
+        </div>
+
+        <div class="row">
+            {% for item in items %}
+                <div class="col-md-4 mb-4">
+                    <div class="card item-card h-100 shadow-sm border-0 border-{{ category_color }}">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top p-3" alt="{{ item.name }}" style="height: 220px; object-fit: contain;">
+                        {% else %}
+                            <div class="no-image-box d-flex align-items-center justify-content-center">
+                                ไม่มีรูปภาพ
+                            </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column text-center">
+                            <h5 class="card-title fw-bold mb-3">{{ item.name }}</h5>
+                            <a href="{% url 'detail' item.pk %}" class="btn btn-{{ category_color }} mt-auto fw-bold py-2">
+                                เรียนรู้ & ทำแบบทดสอบ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="empty-state d-inline-block px-4 py-3">
+                        ⚠️ ไม่พบรายการในหมวดหมู่นี้
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>

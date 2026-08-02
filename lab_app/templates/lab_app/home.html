@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChemLab Learning - หน้าแรก</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --lab-navy:#0B2E33;
+            --lab-navy-deep:#081F23;
+            --lab-teal:#16C79A;
+            --lab-amber:#FFB238;
+            --lab-coral:#E4573D;
+            --lab-paper:#F7F5F0;
+            --lab-ink:#1B262C;
+            --lab-line:#E4E0D6;
+        }
+
+        *{ font-family:'Sarabun', sans-serif; }
+        .mono{ font-family:'Space Mono', monospace; }
+
+        body{ background:var(--lab-paper); color:var(--lab-ink); }
+
+        /* ---------- Navbar ---------- */
+        .lab-navbar{
+            background:linear-gradient(180deg, var(--lab-navy) 0%, var(--lab-navy-deep) 100%);
+            border-bottom:1px solid rgba(255,255,255,.06);
+        }
+        .lab-brand{
+            display:flex; align-items:center; gap:.6rem;
+            color:var(--lab-paper); text-decoration:none;
+        }
+        .lab-brand:hover{ color:var(--lab-teal); }
+        .brand-tile{
+            width:36px; height:36px;
+            border:1.5px solid rgba(22,199,154,.55);
+            border-radius:7px;
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            color:var(--lab-teal);
+            background:rgba(22,199,154,.08);
+            line-height:1;
+        }
+        .brand-tile .num{ font-size:.42rem; align-self:flex-start; margin-left:4px; opacity:.7; }
+        .brand-tile .sym{ font-size:.85rem; font-weight:700; }
+        .brand-name{ font-weight:700; font-size:1.15rem; letter-spacing:.2px; }
+
+        .greeting-text{ color:rgba(247,245,240,.85); font-size:.92rem; }
+        .badge-admin{
+            background:var(--lab-amber); color:var(--lab-navy-deep);
+            font-weight:700; font-size:.65rem;
+        }
+
+        .btn-lab-outline{
+            border:1.5px solid rgba(247,245,240,.4);
+            color:var(--lab-paper);
+            background:transparent;
+            font-weight:600; font-size:.85rem;
+            border-radius:7px;
+        }
+        .btn-lab-outline:hover{ background:rgba(247,245,240,.1); color:var(--lab-teal); border-color:var(--lab-teal); }
+
+        .btn-lab-amber{
+            background:var(--lab-amber); color:var(--lab-navy-deep);
+            font-weight:700; font-size:.85rem; border:none; border-radius:7px;
+        }
+        .btn-lab-amber:hover{ background:#ffc35c; color:var(--lab-navy-deep); }
+
+        .btn-lab-solid{
+            background:var(--lab-paper); color:var(--lab-navy-deep);
+            font-weight:700; font-size:.85rem; border:none; border-radius:7px;
+        }
+        .btn-lab-solid:hover{ background:#fff; }
+
+        /* ---------- Hero ---------- */
+        .lab-hero{
+            position:relative;
+            padding:3.5rem 0 2.5rem;
+            overflow:hidden;
+        }
+        .lab-hero .grid-lines{
+            position:absolute; inset:0;
+            background-image:
+                linear-gradient(rgba(11,46,51,.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(11,46,51,.045) 1px, transparent 1px);
+            background-size:26px 26px;
+            pointer-events:none;
+        }
+        .hero-eyebrow{
+            font-size:.75rem; letter-spacing:.16em; font-weight:700;
+            color:#0C9A78;
+        }
+        .hero-title{ font-weight:700; color:var(--lab-ink); }
+        .hero-sub{ color:#6B6656; }
+
+        /* ---------- Menu cards ---------- */
+        .menu-card{
+            transition:transform .22s ease, box-shadow .22s ease;
+            cursor:pointer;
+            text-decoration:none;
+            border-radius:16px;
+            border-top:4px solid var(--accent, var(--lab-teal));
+            background:#fff;
+        }
+        .menu-card:hover{
+            transform:translateY(-8px);
+            box-shadow:0 22px 40px -18px rgba(11,46,51,.35) !important;
+        }
+        .menu-card.teal{ --accent: var(--lab-teal); }
+        .menu-card.amber{ --accent: var(--lab-amber); }
+        .menu-card.coral{ --accent: var(--lab-coral); }
+
+        .icon-badge{
+            width:84px; height:84px;
+            border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:2.4rem;
+            background:color-mix(in srgb, var(--accent) 14%, white);
+            margin-bottom:1rem;
+        }
+
+        .menu-card h3{ color:var(--lab-ink); }
+        .menu-card p{ color:#6B6656; }
+
+        .btn-menu{
+            background:var(--accent);
+            color:#0B2E33;
+            font-weight:700;
+            border-radius:50px;
+            padding:.55rem 1.3rem;
+            border:none;
+        }
+        .menu-card.coral .btn-menu{ color:#fff; }
+        .btn-menu:hover{ filter:brightness(1.08); color:inherit; }
+
+        .caption-mono{
+            font-size:.72rem; color:#8A8578; letter-spacing:.05em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <nav class="navbar lab-navbar mb-5 shadow-sm">
+        <div class="container py-2">
+            <a class="lab-brand" href="{% url 'home' %}">
+                <div class="brand-tile mono">
+                    <span class="num">6</span>
+                    <span class="sym">C</span>
+                </div>
+                <span class="brand-name">ChemLab Learning</span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                {% if user.is_authenticated %}
+                    <span class="greeting-text me-2">
+                        สวัสดี, <strong>{{ user.username }}</strong>
+                        {% if user.is_staff %}
+                            <span class="badge badge-admin ms-1">Admin</span>
+                        {% endif %}
+                    </span>
+
+                    {% if user.is_staff %}
+                        <a href="/admin/" target="_blank" class="btn btn-lab-amber btn-sm">⚙️ หลังบ้าน</a>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-lab-solid btn-sm">📈 คะแนนนักเรียน</a>
+                    {% else %}
+                        <a href="{% url 'my_scores' %}" class="btn btn-lab-outline btn-sm">📊 คะแนนของฉัน</a>
+                    {% endif %}
+
+                    <form action="{% url 'logout' %}" method="post" class="d-inline m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-lab-outline btn-sm">ออกจากระบบ</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-lab-solid btn-sm">เข้าสู่ระบบ</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="lab-hero">
+        <div class="grid-lines"></div>
+        <div class="container position-relative text-center">
+            <div class="hero-eyebrow mono mb-2">WELCOME TO THE LAB</div>
+            <h1 class="hero-title display-5 mb-3">ยินดีต้อนรับสู่ ChemLab Learning</h1>
+            <p class="hero-sub fs-5">กรุณาเลือกหมวดหมู่ที่ต้องการเรียนรู้หรือทำแบบทดสอบ</p>
+        </div>
+    </div>
+
+    <!-- Main Content: 3 ปุ่มเลือกหมวดหมู่ -->
+    <div class="container my-4 pb-5">
+        <div class="row g-4 justify-content-center">
+
+            <!-- ปุ่มที่ 1: เครื่องแก้ว -->
+            <div class="col-md-4">
+                <a href="{% url 'glassware_list' %}" class="card h-100 border-0 shadow-sm text-center p-4 menu-card teal text-dark">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-badge">🧪</div>
+                        <div class="caption-mono mono mb-1">CATEGORY 01</div>
+                        <h3 class="fw-bold mb-2 fs-4">เครื่องแก้ว</h3>
+                        <p class="mb-4">เรียนรู้เกี่ยวกับบีกเกอร์ หลอดทดลอง และเครื่องแก้วเคมีชนิดต่างๆ</p>
+                        <span class="btn-menu mt-auto">เข้าสู่หมวดหมู่ →</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- ปุ่มที่ 2: เครื่องมือวิทยาศาสตร์ -->
+            <div class="col-md-4">
+                <a href="{% url 'instrument_list' %}" class="card h-100 border-0 shadow-sm text-center p-4 menu-card amber text-dark">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-badge">🔬</div>
+                        <div class="caption-mono mono mb-1">CATEGORY 02</div>
+                        <h3 class="fw-bold mb-2 fs-4">เครื่องมือวิทยาศาสตร์</h3>
+                        <p class="mb-4">ศึกษาเครื่องชั่งไฟฟ้า เครื่องวัด pH ตู้อบลมร้อน และเครื่องมือวัดระดับสูง</p>
+                        <span class="btn-menu mt-auto">เข้าสู่หมวดหมู่ →</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- ปุ่มที่ 3: ข้อสอบ 40 ข้อ -->
+            <div class="col-md-4">
+                <a href="{% url 'quiz_40' %}" class="card h-100 border-0 shadow-sm text-center p-4 menu-card coral text-dark">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-badge">📝</div>
+                        <div class="caption-mono mono mb-1">FINAL TEST</div>
+                        <h3 class="fw-bold mb-2 fs-4">แบบทดสอบ 40 ข้อ</h3>
+                        <p class="mb-4">วัดความรู้รวมอุปกรณ์ทั้งหมดในห้องปฏิบัติการความยาว 40 ข้อ</p>
+                        <span class="btn-menu mt-auto">เริ่มทำแบบทดสอบ →</span>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สมัครสมาชิก - ChemLab Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --lab-navy:#0B2E33;
+            --lab-navy-deep:#081F23;
+            --lab-teal:#16C79A;
+            --lab-amber:#FFB238;
+            --lab-paper:#F7F5F0;
+            --lab-ink:#1B262C;
+            --lab-line:#E4E0D6;
+        }
+
+        *{ font-family:'Sarabun', sans-serif; }
+        .mono{ font-family:'Space Mono', monospace; }
+
+        body{
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255,178,56,.10), transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(22,199,154,.08), transparent 40%),
+                var(--lab-navy-deep);
+            min-height:100vh;
+        }
+
+        .lab-wrapper{ max-width:840px; width:100%; }
+
+        .lab-card{
+            border-radius:18px;
+            overflow:hidden;
+            box-shadow:0 30px 60px -20px rgba(0,0,0,.55);
+            border:1px solid rgba(255,255,255,.06);
+        }
+
+        /* ---------- Left panel: signature flask ---------- */
+        .lab-side{
+            background:linear-gradient(180deg, var(--lab-navy) 0%, var(--lab-navy-deep) 100%);
+            position:relative;
+            min-height:100%;
+            padding:2.5rem 2rem;
+            color:var(--lab-paper);
+            overflow:hidden;
+        }
+
+        .lab-grid-lines{
+            position:absolute; inset:0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+            background-size:26px 26px;
+            pointer-events:none;
+        }
+
+        .element-tile{
+            width:52px; height:52px;
+            border:1.5px solid rgba(255,178,56,.55);
+            border-radius:8px;
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            color:var(--lab-amber);
+            background:rgba(255,178,56,.07);
+        }
+        .element-tile .num{ font-size:.55rem; align-self:flex-start; margin-left:6px; opacity:.7; }
+        .element-tile .sym{ font-size:1.35rem; font-weight:700; line-height:1; }
+
+        .brand-title{ font-weight:700; letter-spacing:.2px; }
+        .brand-sub{ color:rgba(247,245,240,.55); font-size:.82rem; }
+
+        /* Two test tubes signature for signup (new sample = new student) */
+        .tube-stage{
+            position:relative;
+            width:150px; height:180px;
+            margin:2.2rem auto 1.4rem;
+            display:flex; align-items:flex-end; justify-content:center;
+            gap:16px;
+        }
+        .tube{
+            position:relative;
+            width:30px; height:130px;
+            border:3px solid rgba(247,245,240,.65);
+            border-top:none;
+            border-radius:0 0 15px 15px;
+            overflow:hidden;
+            box-sizing:border-box;
+        }
+        .tube::before{
+            content:""; position:absolute; top:-3px; left:-9px; right:-9px; height:3px;
+            background:rgba(247,245,240,.65);
+        }
+        .tube-fill{
+            position:absolute; left:0; right:0; bottom:0;
+            animation: fillRise 3.5s ease-in-out infinite;
+        }
+        .tube.a{ height:120px; }
+        .tube.b{ height:150px; }
+        .tube.a .tube-fill{ background:linear-gradient(180deg, var(--lab-amber), #D98F1B); animation-delay:0s; }
+        .tube.b .tube-fill{ background:linear-gradient(180deg, var(--lab-teal), #0C9A78); animation-delay:1.2s; }
+
+        @keyframes fillRise{
+            0%, 100%{ height:35%; }
+            50%{ height:68%; }
+        }
+
+        .lab-caption{
+            text-align:center; font-size:.78rem;
+            color:rgba(247,245,240,.5);
+            letter-spacing:.03em;
+        }
+
+        /* ---------- Right panel: form ---------- */
+        .lab-form-side{
+            background:var(--lab-paper);
+            padding:2.75rem 2.5rem;
+            color:var(--lab-ink);
+        }
+
+        .form-eyebrow{
+            font-size:.72rem; letter-spacing:.14em;
+            color:#B9760F; font-weight:700;
+        }
+
+        .form-title{ color:var(--lab-ink); font-weight:700; }
+
+        /* Generic styling for Django's {{ form.as_p }} output */
+        form p{ margin-bottom:1rem; }
+        form label{
+            font-size:.82rem; font-weight:600; color:var(--lab-ink);
+            display:block; margin-bottom:.35rem;
+        }
+        form input,
+        form select,
+        form textarea{
+            width:100%;
+            border:1.5px solid var(--lab-line);
+            border-radius:9px;
+            padding:.6rem .85rem;
+            background:#fff;
+            font-family:'Sarabun', sans-serif;
+        }
+        form input:focus,
+        form select:focus,
+        form textarea:focus{
+            outline:none;
+            border-color:var(--lab-amber);
+            box-shadow:0 0 0 .18rem rgba(255,178,56,.22);
+        }
+        form .helptext{
+            display:block;
+            font-size:.74rem;
+            color:#8A8578;
+            margin-top:.25rem;
+        }
+        form ul.errorlist{
+            list-style:none; padding:0; margin:.3rem 0 0;
+            font-size:.78rem; color:#9A3B3B;
+        }
+
+        .btn-lab{
+            background:var(--lab-navy);
+            color:var(--lab-paper);
+            border:none;
+            border-radius:9px;
+            font-weight:700;
+            padding:.7rem 1rem;
+            transition:background .2s ease, transform .1s ease;
+        }
+        .btn-lab:hover{ background:var(--lab-navy-deep); color:var(--lab-amber); }
+        .btn-lab:active{ transform:translateY(1px); }
+
+        .login-line a{ color:#B9760F; }
+        .login-line a:hover{ color:var(--lab-navy); }
+
+        @media (max-width:767.98px){
+            .lab-side{ min-height:auto; padding:2rem 1.5rem 1.6rem; }
+            .tube-stage{ width:120px; height:150px; margin-top:1.4rem; }
+        }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center py-4 px-3">
+
+    <div class="lab-wrapper">
+        <div class="lab-card row g-0">
+
+            <!-- Signature side -->
+            <div class="col-md-5 lab-side">
+                <div class="lab-grid-lines"></div>
+                <div class="position-relative">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="element-tile">
+                            <span class="num mono">79</span>
+                            <span class="sym mono">Au</span>
+                        </div>
+                        <div>
+                            <div class="brand-title fs-5 mono">ChemLab</div>
+                            <div class="brand-sub mono">Learning Platform</div>
+                        </div>
+                    </div>
+
+                    <div class="tube-stage">
+                        <div class="tube a"><div class="tube-fill"></div></div>
+                        <div class="tube b"><div class="tube-fill"></div></div>
+                    </div>
+
+                    <p class="lab-caption mono mb-0">// เตรียมตัวอย่างใหม่ของคุณ</p>
+                </div>
+            </div>
+
+            <!-- Form side -->
+            <div class="col-md-7 lab-form-side">
+                <div class="form-eyebrow mono mb-1">NEW SAMPLE — สมัครสมาชิก</div>
+                <h3 class="form-title mb-4">สมัครสมาชิกใหม่</h3>
+
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-lab w-100 mt-2">สมัครสมาชิก</button>
+                </form>
+
+                <div class="text-center mt-4 login-line">
+                    <small class="text-muted">มีบัญชีอยู่แล้ว? <a href="{% url 'login' %}" class="text-decoration-none fw-bold">เข้าสู่ระบบที่นี่</a></small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติคะแนนของฉัน - ChemLab Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --lab-navy:#0B2E33;
+            --lab-navy-deep:#081F23;
+            --lab-teal:#16C79A;
+            --lab-amber:#FFB238;
+            --lab-coral:#E4573D;
+            --lab-paper:#F7F5F0;
+            --lab-ink:#1B262C;
+            --lab-line:#E4E0D6;
+        }
+
+        *{ font-family:'Sarabun', sans-serif; }
+        .mono{ font-family:'Space Mono', monospace; }
+
+        body{ background:var(--lab-paper); color:var(--lab-ink); }
+
+        /* ---------- Navbar ---------- */
+        .lab-navbar{
+            background:linear-gradient(180deg, var(--lab-navy) 0%, var(--lab-navy-deep) 100%) !important;
+        }
+        .lab-brand{ display:flex; align-items:center; gap:.6rem; color:var(--lab-paper) !important; text-decoration:none; }
+        .lab-brand:hover{ color:var(--lab-teal) !important; }
+        .brand-tile{
+            width:34px; height:34px;
+            border:1.5px solid rgba(22,199,154,.55);
+            border-radius:7px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            color:var(--lab-teal); background:rgba(22,199,154,.08); line-height:1;
+        }
+        .brand-tile .num{ font-size:.4rem; align-self:flex-start; margin-left:4px; opacity:.7; }
+        .brand-tile .sym{ font-size:.8rem; font-weight:700; }
+        .brand-name{ font-weight:700; font-size:1.1rem; }
+        .btn-back{
+            background:transparent; border:1.5px solid rgba(247,245,240,.4);
+            color:var(--lab-paper); font-weight:600; border-radius:7px;
+        }
+        .btn-back:hover{ background:rgba(247,245,240,.1); color:var(--lab-teal); border-color:var(--lab-teal); }
+
+        /* ---------- Header card ---------- */
+        .header-card{ border-radius:16px; border-top:4px solid var(--lab-teal); }
+        .header-eyebrow{ font-size:.72rem; letter-spacing:.14em; font-weight:700; color:#0C9A78; }
+        .header-title{ font-weight:700; color:var(--lab-ink); }
+
+        /* ---------- Table card ---------- */
+        .table-card{ border-radius:16px; overflow:hidden; }
+        table thead.table-light th{
+            background:var(--lab-paper) !important;
+            color:#6B6656; font-size:.78rem; letter-spacing:.04em;
+            text-transform:uppercase; font-weight:700;
+            border-bottom:1.5px solid var(--lab-line);
+        }
+        table tbody tr:hover{ background:rgba(22,199,154,.05); }
+        table td{ border-color:var(--lab-line); }
+        .score-cell{ font-family:'Space Mono', monospace; font-weight:700; color:#0C9A78; }
+        .pct-cell{ font-family:'Space Mono', monospace; font-weight:700; }
+
+        .badge-pass{ background:var(--lab-teal) !important; color:var(--lab-navy-deep) !important; }
+        .badge-fail{ background:var(--lab-coral) !important; }
+
+        .btn-review{
+            border:1.5px solid var(--lab-navy); color:var(--lab-navy);
+            background:transparent; font-weight:600; border-radius:7px;
+        }
+        .btn-review:hover{ background:var(--lab-navy); color:#fff; }
+
+        .empty-cta{
+            background:var(--lab-teal); color:var(--lab-navy-deep);
+            font-weight:700; border:none; border-radius:9px;
+        }
+        .empty-cta:hover{ background:#12b28a; color:var(--lab-navy-deep); }
+
+        /* ---------- Bottom actions ---------- */
+        .btn-new-quiz{
+            background:var(--lab-teal); color:var(--lab-navy-deep);
+            font-weight:700; border:none; border-radius:9px;
+        }
+        .btn-new-quiz:hover{ background:#12b28a; color:var(--lab-navy-deep); }
+        .btn-lab-outline-nav{
+            border:1.5px solid var(--lab-navy); color:var(--lab-navy);
+            background:transparent; font-weight:700; border-radius:9px;
+        }
+        .btn-lab-outline-nav:hover{ background:var(--lab-navy); color:#fff; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark lab-navbar mb-4 shadow-sm">
+        <div class="container py-2">
+            <a class="lab-brand" href="{% url 'home' %}">
+                <div class="brand-tile mono">
+                    <span class="num">6</span>
+                    <span class="sym">C</span>
+                </div>
+                <span class="brand-name">ChemLab Learning</span>
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-back btn-sm">← กลับหน้าหลัก</a>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+
+        <!-- หัวข้อหน้า -->
+        <div class="card header-card border-0 shadow-sm p-4 mb-4 bg-white">
+            <div class="header-eyebrow mono mb-1">MY RESULTS</div>
+            <h3 class="header-title mb-1">📊 ประวัติการทำแบบทดสอบของฉัน</h3>
+            <p class="text-muted mb-0">ผู้ใช้งาน: <strong>{{ user.username }}</strong></p>
+        </div>
+
+        <!-- ตารางแสดงคะแนน -->
+        <div class="card table-card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">#</th>
+                                <th>คะแนนที่ได้</th>
+                                <th class="text-center">คิดเป็นร้อยละ</th>
+                                <th class="text-center">ผลการทดสอบ</th>
+                                <th>วันที่-เวลาที่ทำ</th>
+                                <th class="text-center">ดูเฉลย</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in results %}
+                                <tr>
+                                    <td class="ps-4">{{ forloop.counter }}</td>
+                                    <td class="score-cell fs-5">{{ row.score }} / {{ row.total_questions }}</td>
+                                    <td class="text-center pct-cell">{{ row.percentage|floatformat:1 }}%</td>
+                                    <td class="text-center">
+                                        {% if row.passed %}
+                                            <span class="badge badge-pass px-3 py-2">✅ ผ่าน (≥ 80%)</span>
+                                        {% else %}
+                                            <span class="badge badge-fail px-3 py-2">❌ ไม่ผ่าน</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ row.date_taken|date:"d/m/Y H:i" }} น.</td>
+                                    <td class="text-center">
+                                        <a href="{% url 'quiz_40_result' pk=row.pk %}" class="btn btn-review btn-sm">
+                                            🔍 ตรวจสอบข้อที่ผิด
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        ยังไม่มีประวัติการทำแบบทดสอบ
+                                        <br>
+                                        <a href="{% url 'quiz_40' %}" class="btn empty-cta btn-sm mt-3">🚀 เริ่มทำแบบทดสอบรวม 40 ข้อเลย</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center my-4">
+            <a href="{% url 'quiz_40' %}" class="btn btn-new-quiz btn-lg me-2 shadow-sm">📝 ทำแบบทดสอบใหม่</a>
+            <a href="{% url 'home' %}" class="btn btn-lab-outline-nav btn-lg shadow-sm">🏠 กลับหน้าหลัก</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

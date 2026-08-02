@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบวัดความรู้ 40 ข้อ - ChemLab Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --lab-navy:#0B2E33;
+            --lab-navy-deep:#081F23;
+            --lab-teal:#16C79A;
+            --lab-amber:#FFB238;
+            --lab-coral:#E4573D;
+            --lab-paper:#F7F5F0;
+            --lab-ink:#1B262C;
+            --lab-line:#E4E0D6;
+        }
+
+        *{ font-family:'Sarabun', sans-serif; }
+        .mono{ font-family:'Space Mono', monospace; }
+
+        body{ background:var(--lab-paper); color:var(--lab-ink); }
+
+        /* ---------- Navbar ---------- */
+        .lab-navbar{
+            background:linear-gradient(180deg, var(--lab-navy) 0%, var(--lab-navy-deep) 100%) !important;
+        }
+        .lab-brand{ display:flex; align-items:center; gap:.6rem; color:var(--lab-paper) !important; text-decoration:none; }
+        .lab-brand:hover{ color:var(--lab-teal) !important; }
+        .brand-tile{
+            width:34px; height:34px;
+            border:1.5px solid rgba(228,87,61,.55);
+            border-radius:7px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            color:var(--lab-coral); background:rgba(228,87,61,.1); line-height:1;
+        }
+        .brand-tile .num{ font-size:.4rem; align-self:flex-start; margin-left:4px; opacity:.7; }
+        .brand-tile .sym{ font-size:.8rem; font-weight:700; }
+        .brand-name{ font-weight:700; font-size:1.1rem; }
+        .taker-text{ color:rgba(247,245,240,.85); font-size:.9rem; }
+
+        /* ---------- Sticky progress bar ---------- */
+        .progress-bar-sticky{
+            position:sticky; top:0; z-index:20;
+            background:#fff;
+            border-bottom:1px solid var(--lab-line);
+            padding:.6rem 0;
+            box-shadow:0 4px 14px rgba(11,46,51,.06);
+        }
+        .progress-track{
+            height:8px; border-radius:6px; background:var(--lab-line); overflow:hidden;
+        }
+        .progress-fill{
+            height:100%; width:0%; background:var(--lab-coral);
+            transition:width .25s ease;
+        }
+        .progress-label{ font-size:.78rem; color:#6B6656; }
+        .progress-count{ font-weight:700; color:var(--lab-ink); }
+
+        /* ---------- Header card ---------- */
+        .quiz-header{ border-radius:16px; border-top:4px solid var(--lab-coral); }
+        .quiz-eyebrow{ font-size:.72rem; letter-spacing:.14em; font-weight:700; color:#C24428; }
+        .quiz-title{ font-weight:700; color:var(--lab-ink); }
+        .pass-badge{
+            background:rgba(228,87,61,.1); color:#C24428;
+            font-weight:700; border-radius:8px; padding:.3rem .7rem; font-size:.85rem;
+            display:inline-block;
+        }
+
+        /* ---------- Question cards ---------- */
+        .q-card{ border-radius:14px; }
+        .q-number{
+            width:34px; height:34px; border-radius:8px;
+            background:var(--lab-navy); color:var(--lab-paper);
+            display:flex; align-items:center; justify-content:center;
+            font-weight:700; font-size:.85rem; flex-shrink:0;
+        }
+        .q-text{ color:var(--lab-ink); }
+
+        .option-box{
+            border:1.5px solid var(--lab-line) !important;
+            border-radius:10px;
+            background:#fff !important;
+            transition:border-color .15s ease, background .15s ease;
+            cursor:pointer;
+        }
+        .option-box:hover{ border-color:var(--lab-coral) !important; background:rgba(228,87,61,.04) !important; }
+        .option-box:has(input:checked){
+            border-color:var(--lab-coral) !important;
+            background:rgba(228,87,61,.08) !important;
+        }
+        .form-check-input:checked{
+            background-color:var(--lab-coral); border-color:var(--lab-coral);
+        }
+        .form-check-input:focus{
+            box-shadow:0 0 0 .15rem rgba(228,87,61,.2);
+            border-color:var(--lab-coral);
+        }
+        .opt-key{ color:#C24428; }
+
+        /* ---------- Submit ---------- */
+        .btn-submit{
+            background:var(--lab-coral); color:#fff;
+            border:none; font-weight:700;
+        }
+        .btn-submit:hover{ background:#cf4630; color:#fff; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark lab-navbar mb-4 shadow-sm">
+        <div class="container py-2">
+            <a class="lab-brand" href="{% url 'home' %}">
+                <div class="brand-tile mono">
+                    <span class="num">0</span>
+                    <span class="sym">Q</span>
+                </div>
+                <span class="brand-name">ChemLab Learning</span>
+            </a>
+            <span class="taker-text">ผู้ทำแบบทดสอบ: <strong>{{ user.username }}</strong></span>
+        </div>
+    </nav>
+
+    <!-- แถบความคืบหน้า (sticky) -->
+    <div class="progress-bar-sticky">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="progress-label mono">ความคืบหน้า</span>
+                <span class="progress-label"><span class="progress-count mono" id="answeredCount">0</span> / {{ questions|length }} ข้อ</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-4">
+        <div class="card quiz-header border-0 shadow-sm p-4 mb-4 bg-white">
+            <div class="quiz-eyebrow mono mb-1">FINAL ASSESSMENT</div>
+            <h2 class="quiz-title mb-2">📝 แบบทดสอบวัดความรู้รวม (40 ข้อ)</h2>
+            <p class="text-muted mb-2">กรุณาเลือกคำตอบที่ถูกต้องที่สุดเพียงข้อเดียวในแต่ละข้อ</p>
+            <span class="pass-badge mono">เกณฑ์การผ่าน: 80% ขึ้นไป (32/40 ข้อ)</span>
+        </div>
+
+        <form action="{% url 'submit_quiz_40' %}" method="POST" id="quizForm">
+            {% csrf_token %}
+
+            {% for q in questions %}
+                <div class="card q-card border-0 shadow-sm mb-3">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="q-number mono">{{ forloop.counter }}</div>
+                            <h5 class="q-text fw-bold mb-0 pt-1">{{ q.question }}</h5>
+                        </div>
+
+                        <div class="row g-2">
+                            {% for key, val in q.options.items %}
+                                <div class="col-md-6">
+                                    <div class="form-check option-box p-3">
+                                        <input class="form-check-input ms-1 me-2" type="radio" name="q_{{ q.id }}" id="q_{{ q.id }}_{{ key }}" value="{{ key }}" required>
+                                        <label class="form-check-label w-100" for="q_{{ q.id }}_{{ key }}">
+                                            <strong class="opt-key">{{ key }}.</strong> {{ val }}
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="text-center my-5">
+                <button type="submit" class="btn btn-submit btn-lg px-5 py-3 shadow rounded-pill" onclick="return confirm('ยืนยันการส่งแบบทดสอบ?')">
+                    🚀 ส่งแบบทดสอบและตรวจคะแนน
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function(){
+            var form = document.getElementById('quizForm');
+            var total = {{ questions|length }};
+            var countEl = document.getElementById('answeredCount');
+            var fillEl = document.getElementById('progressFill');
+
+            function updateProgress(){
+                var groups = {};
+                form.querySelectorAll('input[type="radio"]:checked').forEach(function(input){
+                    groups[input.name] = true;
+                });
+                var answered = Object.keys(groups).length;
+                countEl.textContent = answered;
+                fillEl.style.width = (total ? (answered / total * 100) : 0) + '%';
+            }
+
+            form.addEventListener('change', updateProgress);
+            updateProgress();
+        })();
+    </script>
+
+</body>
+</html>

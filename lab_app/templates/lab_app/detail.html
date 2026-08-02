@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ item.name }} - ChemLab Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --lab-navy:#0B2E33;
+            --lab-navy-deep:#081F23;
+            --lab-teal:#16C79A;
+            --lab-amber:#FFB238;
+            --lab-coral:#E4573D;
+            --lab-paper:#F7F5F0;
+            --lab-ink:#1B262C;
+            --lab-line:#E4E0D6;
+        }
+
+        *{ font-family:'Sarabun', sans-serif; }
+        .mono{ font-family:'Space Mono', monospace; }
+
+        body{ background:var(--lab-paper); color:var(--lab-ink); }
+
+        /* Retheme bootstrap primary to the lab teal, kept as-is elsewhere on site */
+        .bg-primary{ background-color:var(--lab-teal) !important; color:var(--lab-navy-deep) !important; }
+        .text-primary{ color:#0C9A78 !important; }
+
+        /* ---------- Navbar ---------- */
+        .lab-navbar{
+            background:linear-gradient(180deg, var(--lab-navy) 0%, var(--lab-navy-deep) 100%) !important;
+        }
+        .lab-brand{ display:flex; align-items:center; gap:.6rem; color:var(--lab-paper) !important; text-decoration:none; }
+        .lab-brand:hover{ color:var(--lab-teal) !important; }
+        .brand-tile{
+            width:34px; height:34px;
+            border:1.5px solid rgba(22,199,154,.55);
+            border-radius:7px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            color:var(--lab-teal); background:rgba(22,199,154,.08); line-height:1;
+        }
+        .brand-tile .num{ font-size:.4rem; align-self:flex-start; margin-left:4px; opacity:.7; }
+        .brand-tile .sym{ font-size:.8rem; font-weight:700; }
+        .brand-name{ font-weight:700; font-size:1.1rem; }
+
+        .btn-back{
+            background:transparent; border:1.5px solid rgba(247,245,240,.4);
+            color:var(--lab-paper); font-weight:600; border-radius:7px;
+        }
+        .btn-back:hover{ background:rgba(247,245,240,.1); color:var(--lab-teal); border-color:var(--lab-teal); }
+
+        /* ---------- Detail card ---------- */
+        .detail-card{ border-radius:16px; }
+
+        .no-image-box{
+            height:300px;
+            background:
+                repeating-linear-gradient(45deg, rgba(11,46,51,.04) 0 10px, transparent 10px 20px),
+                var(--lab-paper);
+            color:#8A8578;
+            border:1px solid var(--lab-line);
+            font-size:.9rem;
+            border-radius:10px;
+        }
+        .item-image-wrap img{ background:#fff; border:1px solid var(--lab-line); }
+
+        .category-badge{ font-weight:700; letter-spacing:.02em; }
+
+        .item-title{ font-weight:700; color:var(--lab-ink); }
+
+        /* Info sections, each with a distinct accent for quick scanning */
+        .info-block{
+            border-left:3px solid var(--accent, var(--lab-teal));
+            padding:.35rem 0 .35rem 1rem;
+            margin-bottom:1.25rem;
+        }
+        .info-block.acc-teal{ --accent: var(--lab-teal); }
+        .info-block.acc-amber{ --accent: var(--lab-amber); }
+        .info-block.acc-coral{ --accent: var(--lab-coral); }
+
+        .info-label{
+            font-size:.72rem; letter-spacing:.1em; font-weight:700;
+            color:var(--accent, var(--lab-teal));
+            text-transform:uppercase;
+        }
+        .info-heading{ font-weight:700; color:var(--lab-ink); }
+        .info-text{ color:#4E5A5C; }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar พร้อมปุ่มย้อนกลับ -->
+    <nav class="navbar navbar-dark lab-navbar mb-4 shadow-sm">
+        <div class="container py-2">
+            <a class="lab-brand" href="{% url 'home' %}">
+                <div class="brand-tile mono">
+                    <span class="num">6</span>
+                    <span class="sym">C</span>
+                </div>
+                <span class="brand-name">ChemLab Learning</span>
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-back btn-sm">← กลับหน้าหลัก</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="card detail-card border-0 shadow-sm p-4">
+            <div class="row g-4 align-items-center">
+
+                <!-- ฝั่งซ้าย: แสดงรูปภาพอุปกรณ์ -->
+                <div class="col-md-5 text-center">
+                    {% if item.image %}
+                        <div class="item-image-wrap d-inline-block rounded">
+                            <img src="{{ item.image.url }}" class="img-fluid rounded p-2" alt="{{ item.name }}" style="max-height: 380px; object-fit: contain;">
+                        </div>
+                    {% else %}
+                        <div class="no-image-box d-flex align-items-center justify-content-center">
+                            ไม่มีรูปภาพอุปกรณ์
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- ฝั่งขวา: แสดงเนื้อหาและรายละเอียด -->
+                <div class="col-md-7">
+                    <h2 class="item-title mb-2">{{ item.name }}</h2>
+
+                    {% if item.category %}
+                        <span class="badge bg-primary category-badge mb-4 fs-6">{{ item.get_category_display }}</span>
+                    {% endif %}
+
+                    {% if item.description %}
+                        <div class="info-block acc-teal">
+                            <div class="info-label mono mb-1">USAGE</div>
+                            <h5 class="info-heading mb-2">การใช้งาน</h5>
+                            <p class="info-text fs-6 mb-0">{{ item.description }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if item.how_to_use %}
+                        <div class="info-block acc-amber">
+                            <div class="info-label mono mb-1">HOW TO USE / CAUTION</div>
+                            <h5 class="info-heading mb-2">วิธีใช้ / ข้อควรระวัง</h5>
+                            <p class="info-text fs-6 mb-0">{{ item.how_to_use }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if item.cleaning %}
+                        <div class="info-block acc-coral">
+                            <div class="info-label mono mb-1">CLEANING & STORAGE</div>
+                            <h5 class="info-heading mb-2">การทำความสะอาด &amp; เก็บรักษา</h5>
+                            <p class="info-text fs-6 mb-0">{{ item.cleaning }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
