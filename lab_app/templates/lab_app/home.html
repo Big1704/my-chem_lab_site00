@@ -14,6 +14,7 @@
             --lab-teal:#16C79A;
             --lab-amber:#FFB238;
             --lab-coral:#E4573D;
+            --lab-purple:#8E44AD;
             --lab-paper:#F7F5F0;
             --lab-ink:#1B262C;
             --lab-line:#E4E0D6;
@@ -111,6 +112,7 @@
         }
         .menu-card.teal{ --accent: var(--lab-teal); }
         .menu-card.amber{ --accent: var(--lab-amber); }
+        .menu-card.purple{ --accent: var(--lab-purple); }
         .menu-card.coral{ --accent: var(--lab-coral); }
 
         .icon-badge{
@@ -133,7 +135,7 @@
             padding:.55rem 1.3rem;
             border:none;
         }
-        .menu-card.coral .btn-menu{ color:#fff; }
+        .menu-card.coral .btn-menu, .menu-card.purple .btn-menu{ color:#fff; }
         .btn-menu:hover{ filter:brightness(1.08); color:inherit; }
 
         .caption-mono{
@@ -190,45 +192,58 @@
         </div>
     </div>
 
-    <!-- Main Content: 3 ปุ่มเลือกหมวดหมู่ -->
+    <!-- Main Content: 4 เมนูปรับ Grid เป็น col-lg-3 col-md-6 เพื่อให้เรียง 4 การ์ดในแถวเดียวได้สมบูรณ์ -->
     <div class="container my-4 pb-5">
         <div class="row g-4 justify-content-center">
 
             <!-- ปุ่มที่ 1: เครื่องแก้ว -->
-            <div class="col-md-4">
+            <div class="col-lg-3 col-md-6">
                 <a href="{% url 'glassware_list' %}" class="card h-100 border-0 shadow-sm text-center p-4 menu-card teal text-dark">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
                         <div class="icon-badge">🧪</div>
                         <div class="caption-mono mono mb-1">CATEGORY 01</div>
-                        <h3 class="fw-bold mb-2 fs-4">เครื่องแก้ว</h3>
-                        <p class="mb-4">เรียนรู้เกี่ยวกับบีกเกอร์ หลอดทดลอง และเครื่องแก้วเคมีชนิดต่างๆ</p>
-                        <span class="btn-menu mt-auto">เข้าสู่หมวดหมู่ →</span>
+                        <h3 class="fw-bold mb-2 fs-5">เครื่องแก้ว</h3>
+                        <p class="mb-4 small">เรียนรู้เกี่ยวกับบีกเกอร์ หลอดทดลอง และเครื่องแก้วเคมีชนิดต่างๆ</p>
+                        <span class="btn-menu mt-auto btn-sm">เข้าสู่หมวดหมู่ →</span>
                     </div>
                 </a>
             </div>
 
             <!-- ปุ่มที่ 2: เครื่องมือวิทยาศาสตร์ -->
-            <div class="col-md-4">
+            <div class="col-lg-3 col-md-6">
                 <a href="{% url 'instrument_list' %}" class="card h-100 border-0 shadow-sm text-center p-4 menu-card amber text-dark">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
                         <div class="icon-badge">🔬</div>
                         <div class="caption-mono mono mb-1">CATEGORY 02</div>
-                        <h3 class="fw-bold mb-2 fs-4">เครื่องมือวิทยาศาสตร์</h3>
-                        <p class="mb-4">ศึกษาเครื่องชั่งไฟฟ้า เครื่องวัด pH ตู้อบลมร้อน และเครื่องมือวัดระดับสูง</p>
-                        <span class="btn-menu mt-auto">เข้าสู่หมวดหมู่ →</span>
+                        <h3 class="fw-bold mb-2 fs-5">เครื่องมือวิทยาศาสตร์</h3>
+                        <p class="mb-4 small">ศึกษาเครื่องชั่งไฟฟ้า เครื่องวัด pH ตู้อบลมร้อน และเครื่องมือวัดระดับสูง</p>
+                        <span class="btn-menu mt-auto btn-sm">เข้าสู่หมวดหมู่ →</span>
                     </div>
                 </a>
             </div>
 
-            <!-- ปุ่มที่ 3: ข้อสอบ 40 ข้อ -->
-            <div class="col-md-4">
-                <a href="{% url 'quiz_40' %}" class="card h-100 border-0 shadow-sm text-center p-4 menu-card coral text-dark">
+            <!-- ปุ่มที่ 3: แบบทดสอบก่อนเรียน (Pre-test) -->
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'quiz_pretest' %}" class="card h-100 border-0 shadow-sm text-center p-4 menu-card purple text-dark">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
                         <div class="icon-badge">📝</div>
-                        <div class="caption-mono mono mb-1">FINAL TEST</div>
-                        <h3 class="fw-bold mb-2 fs-4">แบบทดสอบ 40 ข้อ</h3>
-                        <p class="mb-4">วัดความรู้รวมอุปกรณ์ทั้งหมดในห้องปฏิบัติการความยาว 40 ข้อ</p>
-                        <span class="btn-menu mt-auto">เริ่มทำแบบทดสอบ →</span>
+                        <div class="caption-mono mono mb-1 text-purple">PRE-TEST</div>
+                        <h3 class="fw-bold mb-2 fs-5">แบบทดสอบก่อนเรียน</h3>
+                        <p class="mb-4 small">วัดความรู้พื้นฐานอุปกรณ์ก่อนเริ่มเรียน จำนวน 40 ข้อ <br><span class="text-muted">(ไม่มีเกณฑ์ผ่าน/ไม่ผ่าน)</span></p>
+                        <span class="btn-menu mt-auto btn-sm">เริ่มทำแบบทดสอบ →</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- ปุ่มที่ 4: แบบทดสอบหลังเรียน (Post-test / Final) -->
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'quiz_40' %}" class="card h-100 border-0 shadow-sm text-center p-4 menu-card coral text-dark">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-badge">🎯</div>
+                        <div class="caption-mono mono mb-1">POST-TEST</div>
+                        <h3 class="fw-bold mb-2 fs-5">แบบทดสอบหลังเรียน</h3>
+                        <p class="mb-4 small">วัดความรู้ประเมินผลหลังเรียน จำนวน 40 ข้อ <br><span class="text-danger fw-semibold">(เกณฑ์ผ่าน 80% / 32 ข้อ)</span></p>
+                        <span class="btn-menu mt-auto btn-sm">เริ่มทำแบบทดสอบ →</span>
                     </div>
                 </a>
             </div>

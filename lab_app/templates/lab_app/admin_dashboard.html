@@ -67,13 +67,28 @@
         .stat-amber{ background:linear-gradient(135deg, var(--lab-amber), #D98F1B); color:var(--lab-navy-deep) !important; }
         .stat-amber h6{ opacity:.65; color:var(--lab-navy-deep); }
 
-        /* ---------- Report table ---------- */
+        /* ---------- Report table & Tabs ---------- */
         .report-card{ border-radius:16px; overflow:hidden; }
         .report-card .card-header{
             background:#fff !important;
             border-bottom:1px solid var(--lab-line);
         }
         .report-eyebrow{ font-size:.72rem; letter-spacing:.14em; font-weight:700; color:#0C9A78; }
+
+        /* Custom Nav Pills */
+        .nav-pills .nav-link {
+            color: var(--lab-ink);
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 16px;
+            border: 1px solid var(--lab-line);
+            background: var(--lab-paper);
+        }
+        .nav-pills .nav-link.active {
+            background-color: var(--lab-navy) !important;
+            color: #fff !important;
+            border-color: var(--lab-navy);
+        }
 
         table thead.table-light th{
             background:var(--lab-paper) !important;
@@ -84,10 +99,11 @@
         table tbody tr:hover{ background:rgba(22,199,154,.05); }
         table td{ border-color:var(--lab-line); }
 
-        .badge-pass{ background:var(--lab-teal) !important; color:var(--lab-navy-deep) !important; }
-        .badge-fail{ background:var(--lab-coral) !important; }
+        .badge-pass{ background:var(--lab-teal) !important; color:var(--lab-navy-deep) !important; font-weight:600; }
+        .badge-fail{ background:var(--lab-coral) !important; font-weight:600; }
+        .badge-pre{ background:rgba(255, 178, 56, 0.2) !important; color:#b87100 !important; border:1px solid rgba(255, 178, 56, 0.5); font-weight:600; }
 
-        .score-cell{ font-family:'Space Mono', monospace; font-weight:700; }
+        .score-cell{ font-family:'Space Mono', monospace; font-weight:700; color:#0C9A78; }
     </style>
 </head>
 <body>
@@ -102,7 +118,7 @@
                 </div>
                 <span class="brand-name">ChemLab Admin Dashboard</span>
             </a>
-            <a href="{% url 'home' %}" class="btn btn-back btn-sm">กลับหน้าหลัก</a>
+            <a href="{% url 'home' %}" class="btn btn-back btn-sm">← กลับหน้าหลัก</a>
         </div>
     </nav>
 
@@ -112,91 +128,162 @@
         <div class="row g-3 mb-4">
             <div class="col-md-3">
                 <div class="card stat-card stat-navy border-0 shadow-sm p-3 text-center">
-                    <span class="stat-icon">📋</span>
-                    <h6 class="mono mb-1">ผู้ทำแบบทดสอบทั้งหมด</h6>
-                    <h2 class="fw-bold my-1">{{ total_attempts }} <span class="fs-6">ครั้ง</span></h2>
+                    <span class="stat-icon">📘</span>
+                    <h6 class="mono mb-1">ผู้สอบก่อนเรียน (Pre-test)</h6>
+                    <h2 class="fw-bold my-1">{{ pretest_results.count }} <span class="fs-6">ครั้ง</span></h2>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card stat-card stat-teal border-0 shadow-sm p-3 text-center">
-                    <span class="stat-icon">✅</span>
-                    <h6 class="mono mb-1">สอบผ่าน (≥ 80%)</h6>
-                    <h2 class="fw-bold my-1">{{ passed_count }} <span class="fs-6">คน</span></h2>
+                    <span class="stat-icon">📗</span>
+                    <h6 class="mono mb-1">ผู้สอบหลังเรียน (Post-test)</h6>
+                    <h2 class="fw-bold my-1">{{ total_attempts }} <span class="fs-6">ครั้ง</span></h2>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card stat-card stat-coral border-0 shadow-sm p-3 text-center">
-                    <span class="stat-icon">❌</span>
-                    <h6 class="mono mb-1">สอบไม่ผ่าน</h6>
-                    <h2 class="fw-bold my-1">{{ failed_count }} <span class="fs-6">คน</span></h2>
+                    <span class="stat-icon">✅</span>
+                    <h6 class="mono mb-1">สอบหลังเรียนผ่าน (≥ 80%)</h6>
+                    <h2 class="fw-bold my-1">{{ passed_count }} <span class="fs-6">คน</span></h2>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card stat-card stat-amber border-0 shadow-sm p-3 text-center">
                     <span class="stat-icon">📈</span>
-                    <h6 class="mono mb-1">อัตราการสอบผ่าน</h6>
+                    <h6 class="mono mb-1">อัตราการสอบหลังเรียนผ่าน</h6>
                     <h2 class="fw-bold my-1">{{ pass_rate }}%</h2>
                 </div>
             </div>
         </div>
 
-        <!-- ตารางแสดงรายชื่อและคะแนน -->
+        <!-- การ์ดตารางข้อมูลพร้อม Nav Tabs -->
         <div class="card report-card border-0 shadow-sm">
-            <div class="card-header py-3">
-                <div class="report-eyebrow mono mb-1">EXAM REPORT</div>
-                <h5 class="fw-bold text-dark mb-0">📊 รายงานผลสอบแบบทดสอบ 40 ข้อ</h5>
+            <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <div class="report-eyebrow mono mb-1">EXAM REPORT</div>
+                    <h5 class="fw-bold text-dark mb-0">📊 รายงานผลการสอบผู้ใช้งาน</h5>
+                </div>
+                <!-- ปุ่มสลับสลับแท็บ Pre-Test / Post-Test -->
+                <ul class="nav nav-pills gap-2" id="examTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="posttest-tab" data-bs-toggle="pill" data-bs-target="#posttest-panel" type="button" role="tab">
+                            📗 ทดสอบหลังเรียน ({{ results_40.count }})
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pretest-tab" data-bs-toggle="pill" data-bs-target="#pretest-panel" type="button" role="tab">
+                            📘 ทดสอบก่อนเรียน ({{ pretest_results.count }})
+                        </button>
+                    </li>
+                </ul>
             </div>
+
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-4">#</th>
-                                <th>ชื่อผู้ใช้งาน (Username)</th>
-                                <th>ชื่อ-นามสกุล / อีเมล</th>
-                                <th class="text-center">คะแนนที่ได้</th>
-                                <th class="text-center">คิดเป็นร้อยละ</th>
-                                <th class="text-center">สถานะ</th>
-                                <th>วันที่-เวลา</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in results_40 %}
-                                <tr>
-                                    <td class="ps-4">{{ forloop.counter }}</td>
-                                    <td><strong>{{ row.user.username }}</strong></td>
-                                    <td>
-                                        {% if row.user.first_name %}
-                                            {{ row.user.first_name }} {{ row.user.last_name }}
-                                        {% else %}
-                                            <span class="text-muted">{{ row.user.email|default:"-" }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-center score-cell fs-5">{{ row.score }} / 40</td>
-                                    <td class="text-center score-cell">{{ row.percentage|floatformat:1 }}%</td>
-                                    <td class="text-center">
-                                        {% if row.passed %}
-                                            <span class="badge badge-pass px-3 py-2">ผ่าน</span>
-                                        {% else %}
-                                            <span class="badge badge-fail px-3 py-2">ไม่ผ่าน</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ row.date_taken|date:"d/m/Y H:i" }} น.</td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="7" class="text-center py-5 text-muted">
-                                        ยังไม่มีประวัติการทำแบบทดสอบในระบบ
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="tab-content" id="examTabsContent">
+
+                    <!-- Tab 1: แบบทดสอบหลังเรียน (Post-Test 40 ข้อ) -->
+                    <div class="tab-pane fade show active" id="posttest-panel" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">#</th>
+                                        <th>ชื่อผู้ใช้งาน (Username)</th>
+                                        <th>ชื่อ-นามสกุล / อีเมล</th>
+                                        <th class="text-center">คะแนนที่ได้</th>
+                                        <th class="text-center">คิดเป็นร้อยละ</th>
+                                        <th class="text-center">สถานะ</th>
+                                        <th>วันที่-เวลา</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in results_40 %}
+                                        <tr>
+                                            <td class="ps-4">{{ forloop.counter }}</td>
+                                            <td><strong>{{ row.user.username }}</strong></td>
+                                            <td>
+                                                {% if row.user.first_name %}
+                                                    {{ row.user.first_name }} {{ row.user.last_name }}
+                                                {% else %}
+                                                    <span class="text-muted">{{ row.user.email|default:"-" }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center score-cell fs-5">{{ row.score }} / {{ row.total_questions }}</td>
+                                            <td class="text-center score-cell">{{ row.percentage|floatformat:1 }}%</td>
+                                            <td class="text-center">
+                                                {% if row.passed %}
+                                                    <span class="badge badge-pass px-3 py-2">ผ่าน</span>
+                                                {% else %}
+                                                    <span class="badge badge-fail px-3 py-2">ไม่ผ่าน</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ row.date_taken|date:"d/m/Y H:i" }} น.</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center py-5 text-muted">
+                                                ยังไม่มีประวัติการทำแบบทดสอบหลังเรียนในระบบ
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: แบบทดสอบก่อนเรียน (Pre-Test) -->
+                    <div class="tab-pane fade" id="pretest-panel" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">#</th>
+                                        <th>ชื่อผู้ใช้งาน (Username)</th>
+                                        <th>ชื่อ-นามสกุล / อีเมล</th>
+                                        <th class="text-center">คะแนนที่ได้</th>
+                                        <th class="text-center">คิดเป็นร้อยละ</th>
+                                        <th class="text-center">ประเภท</th>
+                                        <th>วันที่-เวลา</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in pretest_results %}
+                                        <tr>
+                                            <td class="ps-4">{{ forloop.counter }}</td>
+                                            <td><strong>{{ row.user.username }}</strong></td>
+                                            <td>
+                                                {% if row.user.first_name %}
+                                                    {{ row.user.first_name }} {{ row.user.last_name }}
+                                                {% else %}
+                                                    <span class="text-muted">{{ row.user.email|default:"-" }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center score-cell fs-5">{{ row.score }} / {{ row.total_questions }}</td>
+                                            <td class="text-center score-cell">{{ row.percentage|floatformat:1 }}%</td>
+                                            <td class="text-center">
+                                                <span class="badge badge-pre px-3 py-2">ทดสอบก่อนเรียน</span>
+                                            </td>
+                                            <td>{{ row.date_taken|date:"d/m/Y H:i" }} น.</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center py-5 text-muted">
+                                                ยังไม่มีประวัติการทำแบบทดสอบก่อนเรียนในระบบ
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
 
     </div>
 
+    <!-- JS สำหรับสลับแท็บของ Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

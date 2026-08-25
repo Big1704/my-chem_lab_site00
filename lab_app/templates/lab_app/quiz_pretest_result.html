@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผลการทดสอบก่อนเรียน - ChemLab Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --lab-navy:#0B2E33;
+            --lab-navy-deep:#081F23;
+            --lab-teal:#16C79A;
+            --lab-amber:#FFB238;
+            --lab-coral:#E4573D;
+            --lab-paper:#F7F5F0;
+            --lab-ink:#1B262C;
+            --lab-line:#E4E0D6;
+        }
+
+        *{ font-family:'Sarabun', sans-serif; }
+        .mono{ font-family:'Space Mono', monospace; }
+
+        body{ background:var(--lab-paper); color:var(--lab-ink); }
+
+        /* ---------- Navbar ---------- */
+        .lab-navbar{
+            background:linear-gradient(180deg, var(--lab-navy) 0%, var(--lab-navy-deep) 100%) !important;
+        }
+        .lab-brand{ display:flex; align-items:center; gap:.6rem; color:var(--lab-paper) !important; text-decoration:none; }
+        .lab-brand:hover{ color:var(--lab-teal) !important; }
+        .brand-tile{
+            width:34px; height:34px;
+            border:1.5px solid rgba(22,199,154,.55);
+            border-radius:7px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            color:var(--lab-teal); background:rgba(22,199,154,.08); line-height:1;
+        }
+        .brand-tile .num{ font-size:.4rem; align-self:flex-start; margin-left:4px; opacity:.7; }
+        .brand-tile .sym{ font-size:.8rem; font-weight:700; }
+        .brand-name{ font-weight:700; font-size:1.1rem; }
+        .btn-back{
+            background:transparent; border:1.5px solid rgba(247,245,240,.4);
+            color:var(--lab-paper); font-weight:600; border-radius:7px;
+        }
+        .btn-back:hover{ background:rgba(247,245,240,.1); color:var(--lab-teal); border-color:var(--lab-teal); }
+
+        /* ---------- Summary card ---------- */
+        .summary-card{ border-radius:18px; }
+        .summary-eyebrow{ font-size:.72rem; letter-spacing:.14em; font-weight:700; color:#0C9A78; }
+        .taker-meta{ color:#6B6656; font-size:.95rem; }
+
+        /* Circular score gauge */
+        .score-gauge{
+            --size:190px;
+            width:var(--size); height:var(--size);
+            margin:1.5rem auto 1rem;
+            border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            background:conic-gradient(var(--lab-teal) calc(var(--pct, 0) * 1%), var(--lab-line) 0);
+            position:relative;
+        }
+        .score-gauge::before{
+            content:""; position:absolute; inset:12px;
+            border-radius:50%; background:#fff;
+        }
+        .score-gauge .gauge-inner{ position:relative; z-index:1; text-align:center; }
+        .gauge-score{ font-family:'Space Mono', monospace; font-weight:700; font-size:2.1rem; color:var(--lab-ink); line-height:1; }
+        .gauge-total{ font-size:.85rem; color:#8A8578; }
+        .gauge-pct{ font-size:1rem; font-weight:700; color:var(--lab-teal); margin-top:.2rem; }
+
+        /* ---------- Wrong answers ---------- */
+        .wrong-heading{ color:#C24428; font-weight:700; }
+        .wrong-card{ border-radius:14px; border-left:4px solid var(--lab-coral) !important; }
+
+        .answer-box{ border-radius:10px; padding:.9rem 1rem; }
+        .answer-wrong{ background:rgba(228,87,61,.08); border:1.5px solid rgba(228,87,61,.3); }
+        .answer-correct{ background:rgba(22,199,154,.08); border:1.5px solid rgba(22,199,154,.3); }
+        .answer-label-wrong{ color:#C24428; font-weight:700; font-size:.85rem; }
+        .answer-label-correct{ color:#0C9A78; font-weight:700; font-size:.85rem; }
+
+        .perfect-banner{
+            background:rgba(22,199,154,.1); border:1.5px solid rgba(22,199,154,.35);
+            color:#0C9A78; border-radius:14px;
+        }
+
+        /* ---------- Actions ---------- */
+        .btn-lab-outline-nav{
+            border:1.5px solid var(--lab-navy); color:var(--lab-navy);
+            background:transparent; font-weight:700; border-radius:9px;
+        }
+        .btn-lab-outline-nav:hover{ background:var(--lab-navy); color:#fff; }
+        .btn-lab-solid-nav{
+            background:var(--lab-navy); color:#fff;
+            font-weight:700; border-radius:9px; border:none;
+        }
+        .btn-lab-solid-nav:hover{ background:var(--lab-navy-deep); color:var(--lab-teal); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark lab-navbar mb-4 shadow-sm">
+        <div class="container py-2">
+            <a class="lab-brand" href="{% url 'home' %}">
+                <div class="brand-tile mono">
+                    <span class="num">6</span>
+                    <span class="sym">C</span>
+                </div>
+                <span class="brand-name">ChemLab Learning</span>
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-back btn-sm">← กลับหน้าหลัก</a>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+
+        <!-- บัตรสรุปผลการสอบ -->
+        <div class="card summary-card border-0 shadow-sm p-4 text-center mb-5 bg-white">
+            <div class="summary-eyebrow mono mb-1">PRE-TEST RESULT</div>
+            <h3 class="fw-bold text-dark mb-1">สรุปผลแบบทดสอบก่อนเรียน (Pre-test)</h3>
+            <p class="taker-meta mb-3">ผู้ทำแบบทดสอบ: <strong>{{ result.user.username }}</strong> | วันที่: {{ result.date_taken|date:"d/m/Y H:i" }}</p>
+
+            <!-- วงกลมแสดงคะแนน -->
+            <div class="score-gauge" style="--pct: {{ result.percentage|floatformat:0 }};">
+                <div class="gauge-inner">
+                    <div class="gauge-score">{{ result.score }}</div>
+                    <div class="gauge-total">/ {{ result.total_questions }} ข้อ</div>
+                    <div class="gauge-pct mono">{{ result.percentage|floatformat:1 }}%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ส่วนแสดงข้อที่ตอบผิด -->
+        {% if wrong_questions %}
+            <div class="mb-4">
+                <h4 class="wrong-heading mb-3">📌 รายการข้อที่ตอบผิด ({{ total_wrong }} ข้อ)</h4>
+            </div>
+
+            {% for item in wrong_questions %}
+                <div class="card wrong-card border-0 shadow-sm mb-3">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold text-dark mb-3">{{ item.question }}</h5>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="answer-box answer-wrong">
+                                    <div class="answer-label-wrong mb-1">❌ คำตอบของคุณ</div>
+                                    <strong>{{ item.user_choice }}.</strong> {{ item.user_choice_text }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="answer-box answer-correct">
+                                    <div class="answer-label-correct mb-1">✅ คำตอบที่ถูกต้อง</div>
+                                    <strong>{{ item.correct_choice }}.</strong> {{ item.correct_choice_text }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="perfect-banner text-center py-4 fw-bold fs-5">
+                🌟 สุดยอดมาก! คุณตอบถูกต้องครบทุกข้อ (ไม่มีข้อผิด)
+            </div>
+        {% endif %}
+
+        <div class="text-center my-5">
+            <a href="{% url 'quiz_pretest' %}" class="btn btn-lab-outline-nav btn-lg me-2">🔄 ทำแบบทดสอบก่อนเรียนอีกครั้ง</a>
+            <a href="{% url 'home' %}" class="btn btn-lab-solid-nav btn-lg">🏠 เริ่มต้นเรียนเนื้อหา</a>
+        </div>
+
+    </div>
+
+</body>
+</html>
