@@ -37,7 +37,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # [เพิ่ม] ช่วยเสิร์ฟ static files บน Render
+    'whitenoise.middleware.WhiteNoiseMiddleware', # ช่วยเสิร์ฟ static files บน Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -50,7 +50,7 @@ ROOT_URLCONF = 'chem_lab_site.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.DjangoTemplates',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates', # [แก้ไข] เติม .django. ให้ถูกต้อง
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -112,7 +112,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles' # [เพิ่ม] แก้จุดเกิด Error collectstatic
+STATIC_ROOT = BASE_DIR / 'staticfiles' # กำหนดพาธ static files ให้ collectstatic
 
 # --- ส่วนจัดการรูปภาพและระบบสมาชิก ---
 
