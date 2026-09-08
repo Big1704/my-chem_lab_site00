@@ -22,9 +22,6 @@ class Equipment(models.Model):
         null=True,
         verbose_name='หน้าที่การทำงาน (เอาไว้ทำอะไร)',
     )
-    how_to_use = models.TextField(
-        blank=True, null=True, verbose_name='วิธีการใช้งาน'
-    )
     cleaning = models.TextField(
         blank=True, null=True, verbose_name='วิธีการเก็บรักษา'
     )
@@ -56,13 +53,12 @@ class Equipment(models.Model):
     def __str__(self):
         return f'[{self.get_category_display()}] {self.name}'
 
-    # 🛠️ ฟังก์ชันแปลง URL ของ YouTube ให้เป็นลิงก์สำหรับ Embed อัตโนมัติ (ปรับปรุงให้รองรับทุกรูปแบบ)
+    # 🛠️ ฟังก์ชันแปลง URL ของ YouTube ให้เป็นลิงก์สำหรับ Embed อัตโนมัติ
     @property
     def youtube_embed_url(self):
         if not self.video_url:
             return ''
 
-        # ดึง Video ID ความยาว 11 ตัวอักษร จากรูปแบบ URL ของ YouTube ต่างๆ
         pattern = r'(?:v=|\/embed\/|youtu\.be\/|\/v\/|\/e\/|watch\?v=|\&v=|\/shorts\/)([^#\&\?]{11})'
         match = re.search(pattern, self.video_url)
 

@@ -24,7 +24,6 @@
 
         body{ background:var(--lab-paper); color:var(--lab-ink); }
 
-        /* Retheme bootstrap primary to the lab teal, kept as-is elsewhere on site */
         .bg-primary{ background-color:var(--lab-teal) !important; color:var(--lab-navy-deep) !important; }
         .text-primary{ color:#0C9A78 !important; }
 
@@ -70,7 +69,7 @@
 
         .item-title{ font-weight:700; color:var(--lab-ink); }
 
-        /* Info sections, each with a distinct accent for quick scanning */
+        /* Info sections */
         .info-block{
             border-left:3px solid var(--accent, var(--lab-teal));
             padding:.35rem 0 .35rem 1rem;
@@ -88,7 +87,7 @@
         .info-heading{ font-weight:700; color:var(--lab-ink); }
         .info-text{ color:#4E5A5C; }
 
-        /* ---------- Video: instrument-monitor styled player frame ---------- */
+        /* ---------- Video ---------- */
         .video-section{
             background:var(--lab-navy-deep);
             border-radius:16px;
@@ -97,7 +96,6 @@
             overflow:hidden;
         }
         .video-section::before{
-            /* faint grid, echoing the lab-paper grid used elsewhere on the site */
             content:"";
             position:absolute; inset:0;
             background-image:
@@ -196,14 +194,6 @@
                             <div class="info-label mono mb-1">USAGE</div>
                             <h5 class="info-heading mb-2">การใช้งาน</h5>
                             <p class="info-text fs-6 mb-0">{{ item.description }}</p>
-                        </div>
-                    {% endif %}
-
-                    {% if item.how_to_use %}
-                        <div class="info-block acc-amber">
-                            <div class="info-label mono mb-1">HOW TO USE / CAUTION</div>
-                            <h5 class="info-heading mb-2">วิธีใช้ / ข้อควรระวัง</h5>
-                            <p class="info-text fs-6 mb-0">{{ item.how_to_use }}</p>
                         </div>
                     {% endif %}
 

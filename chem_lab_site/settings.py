@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-pi#p+_pbp(ee1_5qt(llmtn@lv_x=iqf4+_uvk@(*lg!espoq+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -37,7 +37,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # เพิ่ม WhiteNoise จัดการไฟล์ static
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -112,7 +111,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles' # กำหนดโฟลเดอร์รวบรวมไฟล์ static บน Server
 
 # --- ส่วนจัดการรูปภาพและระบบสมาชิก ---
 
@@ -123,3 +121,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # กำหนดหน้าปลายทางเมื่อเข้าสู่ระบบ / ออกจากระบบ สำเร็จ (อ้างอิงชื่อ name='home')
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+ALLOWED_HOSTS = ['*']
