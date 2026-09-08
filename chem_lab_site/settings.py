@@ -50,7 +50,7 @@ ROOT_URLCONF = 'chem_lab_site.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates', # [แก้ไข] เติม .django. ให้ถูกต้อง
+        'BACKEND': 'django.template.backends.django.DjangoTemplates', # เติม , ปิดท้ายบรรทัดเรียบร้อย
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
