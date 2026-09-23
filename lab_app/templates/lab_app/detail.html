@@ -159,7 +159,7 @@
                 </div>
                 <span class="brand-name">ChemLab Learning</span>
             </a>
-            <a href="{% url 'home' %}" class="btn btn-back btn-sm">← กลับหน้าหลัก</a>
+            <a href="{% url 'glassware_list' %}" class="btn btn-back btn-sm">← กลับหน้ารายการเครื่องแก้ว</a>
         </div>
     </nav>
 
@@ -189,18 +189,38 @@
                         <span class="badge bg-primary category-badge mb-4 fs-6">{{ item.get_category_display }}</span>
                     {% endif %}
 
+                    <!-- 1. หน้าที่การทำงาน -->
                     {% if item.description %}
                         <div class="info-block acc-teal">
-                            <div class="info-label mono mb-1">USAGE</div>
-                            <h5 class="info-heading mb-2">การใช้งาน</h5>
+                            <div class="info-label mono mb-1">DESCRIPTION</div>
+                            <h5 class="info-heading mb-2">📌 หน้าที่การทำงาน</h5>
                             <p class="info-text fs-6 mb-0">{{ item.description }}</p>
                         </div>
                     {% endif %}
 
+                    <!-- 2. วิธีการใช้งาน -->
+                    {% if item.how_to_use %}
+                        <div class="info-block acc-teal">
+                            <div class="info-label mono mb-1">HOW TO USE</div>
+                            <h5 class="info-heading mb-2">🧪 วิธีการใช้งาน</h5>
+                            <p class="info-text fs-6 mb-0">{{ item.how_to_use }}</p>
+                        </div>
+                    {% endif %}
+
+                    <!-- 3. ข้อควรระวัง -->
+                    {% if item.caution %}
+                        <div class="info-block acc-amber">
+                            <div class="info-label mono mb-1">CAUTION</div>
+                            <h5 class="info-heading mb-2">⚠️ ข้อควรระวัง</h5>
+                            <p class="info-text fs-6 mb-0">{{ item.caution }}</p>
+                        </div>
+                    {% endif %}
+
+                    <!-- 4. วิธีการทำความสะอาดและเก็บรักษา -->
                     {% if item.cleaning %}
                         <div class="info-block acc-coral">
                             <div class="info-label mono mb-1">CLEANING &amp; STORAGE</div>
-                            <h5 class="info-heading mb-2">การทำความสะอาด &amp; เก็บรักษา</h5>
+                            <h5 class="info-heading mb-2">🧽 การทำความสะอาด &amp; เก็บรักษา</h5>
                             <p class="info-text fs-6 mb-0">{{ item.cleaning }}</p>
                         </div>
                     {% endif %}

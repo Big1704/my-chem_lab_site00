@@ -22,6 +22,13 @@ class Equipment(models.Model):
         null=True,
         verbose_name='หน้าที่การทำงาน (เอาไว้ทำอะไร)',
     )
+    # 🌟 เพิ่ม 2 ฟิลด์นี้
+    how_to_use = models.TextField(
+        blank=True, null=True, verbose_name='วิธีการใช้งาน'
+    )
+    caution = models.TextField(
+        blank=True, null=True, verbose_name='ข้อควรระวัง'
+    )
     cleaning = models.TextField(
         blank=True, null=True, verbose_name='วิธีการเก็บรักษา'
     )
@@ -32,7 +39,7 @@ class Equipment(models.Model):
         verbose_name='รูปภาพอุปกรณ์',
     )
 
-    # 🎬 เพิ่มฟิลด์รองรับวิดีโอ
+    # 🎬 ฟิลด์รองรับวิดีโอ
     video_url = models.URLField(
         max_length=500,
         blank=True,
@@ -53,7 +60,6 @@ class Equipment(models.Model):
     def __str__(self):
         return f'[{self.get_category_display()}] {self.name}'
 
-    # 🛠️ ฟังก์ชันแปลง URL ของ YouTube ให้เป็นลิงก์สำหรับ Embed อัตโนมัติ
     @property
     def youtube_embed_url(self):
         if not self.video_url:

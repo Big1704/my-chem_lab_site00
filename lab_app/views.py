@@ -1,13 +1,20 @@
+import random
 import re
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Equipment, Quiz40Result, QuizPreTestResult, QuizResult
-from .quiz_data import QUIZ_40_QUESTIONS
+from .quiz_data import QUIZ_50_QUESTIONS
 
 
-# Helper Function เช็กสิทธิ์ Admin/Staff
+# Helper Function: ดึงข้อมูลข้อสอบจากคลังตาม List ของ ID ที่สุ่มได้
+def get_questions_by_ids(q_ids):
+    q_map = {q['id']: q for q in QUIZ_50_QUESTIONS}
+    return [q_map[qid] for qid in q_ids if qid in q_map]
+
+
+# Helper Function: เช็กสิทธิ์ Admin/Staff
 def is_admin(user):
     return user.is_staff or user.is_superuser
 
@@ -28,42 +35,45 @@ def glassware_list(request):
     return render(request, 'lab_app/equipment_list.html', context)
 
 
-# 3. หน้าแสดงเฉพาะเครื่องมือวิทยาศาสตร์
-def instrument_list(request):
-    items = Equipment.objects.filter(category='instrument')
-    context = {
-        'items': items,
-        'title': '🔬 เครื่องมือวิทยาศาสตร์ (Instruments)',
-        'category_color': 'success',
-    }
-    return render(request, 'lab_app/equipment_list.html', context)
-
-
-# 4. หน้ารายละเอียดอุปกรณ์แต่ละชิ้น
+# 3. หน้ารายละเอียดเครื่องแก้วแต่ละชิ้น
 def detail(request, pk):
-    item = get_object_or_404(Equipment, pk=pk)
+    item = get_object_or_404(Equipment, pk=pk, category='glassware')
     return render(request, 'lab_app/detail.html', {'item': item})
 
 
-# --- 📝 แบบทดสอบก่อนเรียน (Pre-test) ---
+# --- 📝 แบบทดสอบก่อนเรียน (Pre-test สุ่ม 40 จาก 50 ข้อ) ---
 
 
-# 5. หน้าแสดงทำแบบทดสอบก่อนเรียน
+# 4. หน้าแสดงทำแบบทดสอบก่อนเรียน
 @login_required(login_url='login')
 def quiz_pretest(request):
+    # สุ่มข้อสอบ 40 ข้อ จากคลัง 50 ข้อ
+    selected_questions = random.sample(
+        QUIZ_50_QUESTIONS, min(40, len(QUIZ_50_QUESTIONS))
+    )
+
+    # บันทึก ID ข้อสอบที่สุ่มได้ลงใน Session
+    request.session['pretest_q_ids'] = [q['id'] for q in selected_questions]
+
     return render(
-        request, 'lab_app/quiz_pretest.html', {'questions': QUIZ_40_QUESTIONS}
+        request, 'lab_app/quiz_pretest.html', {'questions': selected_questions}
     )
 
 
-# 6. ประมวลผลแบบทดสอบก่อนเรียน (ไม่มีเกณฑ์ผ่าน บันทึกลง DB)
+# 5. ประมวลผลแบบทดสอบก่อนเรียน (ไม่มีเกณฑ์ผ่าน บันทึกลง DB)
 @login_required(login_url='login')
 def submit_quiz_pretest(request):
     if request.method == 'POST':
+        # ดึง ID ข้อสอบชุดที่สุ่มได้จาก Session
+        q_ids = request.session.get('pretest_q_ids', [])
+        if not q_ids:
+            return redirect('quiz_pretest')
+
+        questions = get_questions_by_ids(q_ids)
         score = 0
         user_answers = {}
 
-        for q in QUIZ_40_QUESTIONS:
+        for q in questions:
             q_id = str(q['id'])
             selected = request.POST.get(f'q_{q_id}')
             user_answers[q_id] = selected
@@ -71,7 +81,7 @@ def submit_quiz_pretest(request):
             if selected == q['correct']:
                 score += 1
 
-        total = len(QUIZ_40_QUESTIONS)
+        total = len(questions)
         percent = (score / total) * 100 if total > 0 else 0
 
         result = QuizPreTestResult.objects.create(
@@ -82,20 +92,25 @@ def submit_quiz_pretest(request):
             user_answers=user_answers,
         )
 
+        # ลบ Session เมื่อประมวลผลเสร็จสิ้น
+        if 'pretest_q_ids' in request.session:
+            del request.session['pretest_q_ids']
+
         return redirect('quiz_pretest_result', pk=result.pk)
     return redirect('quiz_pretest')
 
 
-# 7. หน้าแสดงผลคะแนนก่อนเรียน และเฉลยข้อที่ทำผิด
+# 6. หน้าแสดงผลคะแนนก่อนเรียน และเฉลยข้อที่ทำผิด
 @login_required(login_url='login')
 def quiz_pretest_result(request, pk):
     result = get_object_or_404(QuizPreTestResult, pk=pk, user=request.user)
 
+    q_map = {str(q['id']): q for q in QUIZ_50_QUESTIONS}
     wrong_questions = []
-    for q in QUIZ_40_QUESTIONS:
-        q_id = str(q['id'])
-        user_choice = result.user_answers.get(q_id)
-        if user_choice != q['correct']:
+
+    for q_id, user_choice in result.user_answers.items():
+        q = q_map.get(q_id)
+        if q and user_choice != q['correct']:
             wrong_questions.append({
                 'id': q['id'],
                 'question': q['question'],
@@ -118,25 +133,38 @@ def quiz_pretest_result(request, pk):
     return render(request, 'lab_app/quiz_pretest_result.html', context)
 
 
-# --- 🌟 แบบทดสอบหลังเรียน (Post-test 40 ข้อ) ---
+# --- 🌟 แบบทดสอบหลังเรียน (Post-test สุ่ม 40 จาก 50 ข้อ) ---
 
 
-# 8. หน้าแสดงทำแบบทดสอบหลังเรียน
+# 7. หน้าแสดงทำแบบทดสอบหลังเรียน
 @login_required(login_url='login')
 def quiz_40(request):
+    # สุ่มข้อสอบ 40 ข้อใหม่แยกต่างหาก
+    selected_questions = random.sample(
+        QUIZ_50_QUESTIONS, min(40, len(QUIZ_50_QUESTIONS))
+    )
+
+    # บันทึก ID ข้อสอบลงใน Session
+    request.session['posttest_q_ids'] = [q['id'] for q in selected_questions]
+
     return render(
-        request, 'lab_app/quiz_40.html', {'questions': QUIZ_40_QUESTIONS}
+        request, 'lab_app/quiz_40.html', {'questions': selected_questions}
     )
 
 
-# 9. ประมวลผลแบบทดสอบหลังเรียน (มีเกณฑ์ผ่าน 80% / 32 ข้อ บันทึกลง DB)
+# 8. ประมวลผลแบบทดสอบหลังเรียน (มีเกณฑ์ผ่าน 80% / 32 ข้อ บันทึกลง DB)
 @login_required(login_url='login')
 def submit_quiz_40(request):
     if request.method == 'POST':
+        q_ids = request.session.get('posttest_q_ids', [])
+        if not q_ids:
+            return redirect('quiz_40')
+
+        questions = get_questions_by_ids(q_ids)
         score = 0
         user_answers = {}
 
-        for q in QUIZ_40_QUESTIONS:
+        for q in questions:
             q_id = str(q['id'])
             selected = request.POST.get(f'q_{q_id}')
             user_answers[q_id] = selected
@@ -144,7 +172,7 @@ def submit_quiz_40(request):
             if selected == q['correct']:
                 score += 1
 
-        total = len(QUIZ_40_QUESTIONS)
+        total = len(questions)
         percent = (score / total) * 100 if total > 0 else 0
         is_passed = score >= 32  # 80% ของ 40 ข้อ คือ 32 ข้อ
 
@@ -157,20 +185,24 @@ def submit_quiz_40(request):
             user_answers=user_answers,
         )
 
+        if 'posttest_q_ids' in request.session:
+            del request.session['posttest_q_ids']
+
         return redirect('quiz_40_result', pk=result.pk)
     return redirect('quiz_40')
 
 
-# 10. หน้าแสดงผลคะแนนหลังเรียน และเฉลยข้อที่ทำผิด
+# 9. หน้าแสดงผลคะแนนหลังเรียน และเฉลยข้อที่ทำผิด
 @login_required(login_url='login')
 def quiz_40_result(request, pk):
     result = get_object_or_404(Quiz40Result, pk=pk, user=request.user)
 
+    q_map = {str(q['id']): q for q in QUIZ_50_QUESTIONS}
     wrong_questions = []
-    for q in QUIZ_40_QUESTIONS:
-        q_id = str(q['id'])
-        user_choice = result.user_answers.get(q_id)
-        if user_choice != q['correct']:
+
+    for q_id, user_choice in result.user_answers.items():
+        q = q_map.get(q_id)
+        if q and user_choice != q['correct']:
             wrong_questions.append({
                 'id': q['id'],
                 'question': q['question'],
@@ -196,18 +228,19 @@ def quiz_40_result(request, pk):
 # --- 📊 ระบบสรุปคะแนนและจัดการผู้ใช้งาน ---
 
 
-# 11. [สำหรับ User] หน้าดูคะแนนตนเอง (แก้ไข Context ให้ตรงกับ template my_scores.html)
+# 10. [สำหรับ User] หน้าดูคะแนนตนเอง
 @login_required(login_url='login')
 def my_scores(request):
-    # ดึงประวัติการทำสอบทั้งหมด
-    results = Quiz40Result.objects.filter(user=request.user).order_by('-date_taken')
-    pretest_results = QuizPreTestResult.objects.filter(user=request.user).order_by('-date_taken')
+    results = Quiz40Result.objects.filter(user=request.user).order_by(
+        '-date_taken'
+    )
+    pretest_results = QuizPreTestResult.objects.filter(
+        user=request.user
+    ).order_by('-date_taken')
 
-    # ดึงผลสอบล่าสุด
     latest_pretest = pretest_results.first()
     latest_posttest = results.first()
 
-    # คำนวณพัฒนาการสำหรับการ์ดสรุปผล
     progress_data = None
     if latest_pretest and latest_posttest:
         score_diff = latest_posttest.score - latest_pretest.score
@@ -220,28 +253,28 @@ def my_scores(request):
         }
 
     context = {
-        'results': results,                  # ตรงกับ {% for row in results %} (ตารางหลังเรียน)
-        'pretest_results': pretest_results,  # ตรงกับ {% for row in pretest_results %} (ตารางก่อนเรียน)
-        'latest_pretest': latest_pretest,    # สำหรับการ์ดคะแนนก่อนเรียน
-        'latest_posttest': latest_posttest,  # สำหรับการ์ดคะแนนหลังเรียน
-        'progress_data': progress_data,      # สำหรับการ์ดสรุปพัฒนาการ
+        'results': results,
+        'pretest_results': pretest_results,
+        'latest_pretest': latest_pretest,
+        'latest_posttest': latest_posttest,
+        'progress_data': progress_data,
     }
     return render(request, 'lab_app/my_scores.html', context)
 
 
-# 12. บันทึกคะแนนแบบทดสอบรายชิ้น
+# 11. บันทึกคะแนนแบบทดสอบรายชิ้น
 @login_required(login_url='login')
 def submit_quiz(request, pk):
     if request.method == 'POST':
         score = request.POST.get('score')
-        item = get_object_or_404(Equipment, pk=pk)
+        item = get_object_or_404(Equipment, pk=pk, category='glassware')
         QuizResult.objects.create(
             user=request.user, equipment=item, score=score
         )
     return redirect('home')
 
 
-# 13. สมัครสมาชิก
+# 12. สมัครสมาชิก
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -253,7 +286,7 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
-# 14. [สำหรับ Admin] หน้า Dashboard สรุปผลสอบผู้ใช้งานทั้งหมด
+# 13. [สำหรับ Admin] หน้า Dashboard สรุปผลสอบผู้ใช้งานทั้งหมด
 @user_passes_test(is_admin, login_url='login')
 def admin_dashboard(request):
     results_40 = (
